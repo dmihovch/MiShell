@@ -1,5 +1,7 @@
 
+#define MAX_INPUT 1024
 
-int main(void){
+int main(int argc, char **argv){
     
+
 }
