@@ -1,5 +1,5 @@
 {
     "files.associations": {
-        "builtins.h": "c"
+        "tokenizer.h": "c"
     }
 }
