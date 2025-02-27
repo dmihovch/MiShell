@@ -11,15 +11,20 @@
 #define MAX_INPUT 1024
 
 int main(int argc, char **argv){
-    
+
     char* cmd_raw = NULL;
     size_t cmd_len = 0;
     ssize_t read;
 
+
+
     read = getline(&cmd_raw, &cmd_len, stdin);
-    cmd_raw[strcspn(cmd_raw, "\n")] = 0;
-    printf("Raw Command:{%s}\nCommand Length:{%ld}",cmd_raw, cmd_len);
-    
+
+
+    TokenNode* head = tokenizer(cmd_raw);
+
+
+    /*
     for(int i = 0; i<cmd_len; i++){
         printf("%c\n", cmd_raw[i]);
     }
@@ -30,7 +35,10 @@ int main(int argc, char **argv){
         tok = strtok(NULL, " ");
     }
 
-   
+
+
+    */
+
 
     free(cmd_raw);
 

@@ -6,4 +6,4 @@ typedef struct TokenNode {
     struct TokenNode *next;
     struct TokenNode *prev;
 } TokenNode;
-TokenNode** tokenizer(char*);
+TokenNode* tokenizer(char*);
