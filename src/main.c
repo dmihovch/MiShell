@@ -14,21 +14,26 @@ int main(int argc, char **argv){
 
     char* cmd_raw = NULL;
     size_t cmd_len = 0;
-    ssize_t read;
+    ssize_t num_read;
 
 
 
-    read = getline(&cmd_raw, &cmd_len, stdin);
-
-
-    TokenNode* head = tokenizer(cmd_raw);
-
-
-    /*
-    for(int i = 0; i<cmd_len; i++){
-        printf("%c\n", cmd_raw[i]);
+    num_read = getline(&cmd_raw, &cmd_len, stdin);
+    if(num_read != -1){
+        if(cmd_raw[num_read-1]=='\n'){
+            cmd_raw[num_read-1] = '\0';
+        }
     }
 
+    token_node* head = tokenizer(cmd_raw);
+    print_tokens_debug(head);
+    free_tokens(head);
+    
+
+    
+
+    /*
+    
     char* tok = strtok(cmd_raw, " ");
     while(tok!=NULL){
         printf("Token={%s}\n",tok);
@@ -40,8 +45,8 @@ int main(int argc, char **argv){
     */
 
 
-    free(cmd_raw);
-
+    
+   free(cmd_raw);
     return 0;
 
 }
