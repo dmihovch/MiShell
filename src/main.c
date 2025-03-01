@@ -12,27 +12,50 @@
 
 int main(int argc, char **argv){
 
-    char* cmd_raw = NULL;
-    size_t cmd_len = 0;
+    token_node* head;
+
+    //return codes for functions
+    int return_code;
+
+
+    //collecting prompt
+    char* cmd_raw;
+    size_t cmd_len;
     ssize_t num_read;
 
 
 
-    num_read = getline(&cmd_raw, &cmd_len, stdin);
-    if(num_read != -1){
-        if(cmd_raw[num_read-1]=='\n'){
-            cmd_raw[num_read-1] = '\0';
+    int keep_running = 1;
+    while(keep_running){
+
+        return_code = 0;
+        cmd_raw = NULL;
+        cmd_len = 0;
+        num_read = 0;
+
+
+        //reads in prompt and gets rid of newline
+        num_read = getline(&cmd_raw, &cmd_len, stdin);
+        if(num_read != -1){
+            if(cmd_raw[num_read-1]=='\n'){
+                cmd_raw[num_read-1] = '\0';
+            }
         }
+
+        head = tokenizer(cmd_raw);
+        return_code = check_builtin(head);
+        
+        
+        
+
     }
+    
+    
+    
 
-    token_node* head = tokenizer(cmd_raw);
+    
+
     print_tokens_debug(head);
-    
-    
-
-    
-
-    
 
     free_tokens(head);
     free(cmd_raw);
