@@ -27,26 +27,15 @@ int main(int argc, char **argv){
 
     token_node* head = tokenizer(cmd_raw);
     print_tokens_debug(head);
+    
+    
+
+    
+
+    
+
     free_tokens(head);
-    
-
-    
-
-    /*
-    
-    char* tok = strtok(cmd_raw, " ");
-    while(tok!=NULL){
-        printf("Token={%s}\n",tok);
-        tok = strtok(NULL, " ");
-    }
-
-
-
-    */
-
-
-    
-   free(cmd_raw);
+    free(cmd_raw);
     return 0;
 
 }
