@@ -1,7 +1,16 @@
 #pragma once
 
 #include <stdio.h>
+#include <unistd.h>
+#include <stdbool.h>
+#include <stdlib.h>
 #include "../include/tokenizer.h"
+#include "../include/utils.h"
 
 
-int check_builtin(token_node*);
+#define BUILTIN_COMMANDS_ARR_LENGTH 8
+
+
+int check_builtin(token_node*, path_node*);
+void exit_cmd(token_node*, path_node*);
+void which_cmd(token_node*);

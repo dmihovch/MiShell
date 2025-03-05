@@ -3,6 +3,7 @@
         "tokenizer.h": "c",
         "utils.h": "c",
         "stdlib.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "string.h": "c"
     }
 }
