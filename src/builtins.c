@@ -4,7 +4,9 @@ int check_builtin(token_node* cmd_head, path_node* path){
     //printf("Entering builtin\n");
     if(cmd_head!=NULL && cmd_head->token != NULL){
         //printf("%s\n",cmd_head->token);
-        if(strcmp(cmd_head->token, "exit") == 0){ exit_cmd(cmd_head,path);}
+        char* cmd = cmd_head->token;
+        if(strcmp(cmd, "exit") == 0){ exit_cmd(cmd_head,path);}
+        if(strcmp(cmd, "which")== 0){ which_cmd(cmd_head,path);}
         
     }
     else{
@@ -34,7 +36,7 @@ void exit_cmd(token_node* cmd_head, path_node* path){
     exit(0);
 }
 
-void which_cmd(token_node* cmd_head){
+void which_cmd(token_node* cmd_head, path_node* path){
     const char *builtin_commands[] = {"exit","which","list","pwd","cd","pwd","pid","prompt"};
     token_node* arg_node = cmd_head->next;
     if(arg_node == NULL){
@@ -43,9 +45,12 @@ void which_cmd(token_node* cmd_head){
     bool found_cmd;
     while(arg_node!=NULL && arg_node->token != NULL){
         found_cmd = false;
+        char* arg = arg_node->token;
+
+        //finding builtins
         for(int i = 0; i<BUILTIN_COMMANDS_ARR_LENGTH; i++){
-            if(strcmp(arg_node->token,builtin_commands[i])==0){
-                printf("%s: shell built-in command\n",arg_node->token);
+            if(strcmp(arg,builtin_commands[i])==0){
+                printf("%s: shell built-in command\n",arg);
                 found_cmd = true;
                 break;
             }
@@ -54,6 +59,32 @@ void which_cmd(token_node* cmd_head){
             arg_node = arg_node -> next;
             continue;
         }
+
+        //finding through absolute paths
+
+        //need to actually do the whole checking of the whether the command 
+        if(access(arg,X_OK)==0){
+            printf("%s\n",arg);
+            arg_node = arg_node -> next;
+            continue;
+        }
+
+
+        //finding through PATH var
+        char* cmd_in_path_var = find_cmd_with_path(path,arg);
+        if(cmd_in_path_var!=NULL){
+            printf("%s\n",cmd_in_path_var);
+            free(cmd_in_path_var);
+        }
+        else{
+            printf("%s not found\n",arg);
+        }
+        
+
+        
+
+
+        arg_node = arg_node -> next;
 
         
 

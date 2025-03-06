@@ -3,7 +3,7 @@
 //just put this in main?
 path_node* get_path(){
     char* path_raw = getenv("PATH");
-    printf("Raw PATH:\n\n%s\n\n",path_raw);
+    //printf("Raw PATH:\n\n%s\n\n",path_raw);
     if(path_raw!=NULL){
         char* path_elem = strtok(path_raw, ":");
         

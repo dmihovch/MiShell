@@ -25,8 +25,8 @@ int main(int argc, char **argv){
 
 
 
-    const path_node* path = get_path();
-    print_path_debug(path);
+    path_node* path = get_path();
+    //print_path_debug(path);
 
 
     while(1) {
@@ -35,6 +35,15 @@ int main(int argc, char **argv){
         cmd_raw = NULL;
         cmd_len = 0;
         num_read = 0;
+
+
+        /*
+        
+                        todo - limit the size of the input for each command
+                        figure out how to do scrolling with arrow keys (cmds)
+        
+        
+        */
 
 
         //reads in prompt and gets rid of newline
@@ -56,20 +65,20 @@ int main(int argc, char **argv){
         if(head == NULL){
             continue;
         }
-        print_tokens_debug(head);
+        //print_tokens_debug(head);
         return_code = check_builtin(head,path);
-        
-        
-        
+
+
+
         free_tokens(head);
     }
-    
-    
-    
+
+
+
 
     printf("\n\n\n\n\nTHIS SHOULD NEVER? PRINT!!\n\n\n\n\n");
 
-    
+
 
     return 0;
 
