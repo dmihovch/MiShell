@@ -39,8 +39,9 @@ int main(int argc, char **argv){
 
         /*
         
-                        todo - limit the size of the input for each command
+                        todo - 
                         figure out how to do scrolling with arrow keys (cmds)
+                        add null checks for each malloc and strdup
         
         
         */

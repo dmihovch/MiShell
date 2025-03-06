@@ -45,12 +45,11 @@ void which_cmd(token_node* cmd_head, path_node* path){
     bool found_cmd;
     while(arg_node!=NULL && arg_node->token != NULL){
         found_cmd = false;
-        char* arg = arg_node->token;
 
         //finding builtins
         for(int i = 0; i<BUILTIN_COMMANDS_ARR_LENGTH; i++){
-            if(strcmp(arg,builtin_commands[i])==0){
-                printf("%s: shell built-in command\n",arg);
+            if(strcmp(arg_node->token,builtin_commands[i])==0){
+                printf("%s: shell built-in command\n",arg_node->token);
                 found_cmd = true;
                 break;
             }
@@ -63,21 +62,22 @@ void which_cmd(token_node* cmd_head, path_node* path){
         //finding through absolute paths
 
         //need to actually do the whole checking of the whether the command 
-        if(access(arg,X_OK)==0){
-            printf("%s\n",arg);
+        if(access(arg_node->token,X_OK)==0){
+            printf("%s\n",arg_node->token);
             arg_node = arg_node -> next;
             continue;
         }
 
 
         //finding through PATH var
-        char* cmd_in_path_var = find_cmd_with_path(path,arg);
+        //printf("Addr of arg is which_cmd: {%p}\n",&arg_node->token);
+        char* cmd_in_path_var = find_cmd_with_path(path,arg_node->token);
         if(cmd_in_path_var!=NULL){
             printf("%s\n",cmd_in_path_var);
             free(cmd_in_path_var);
         }
         else{
-            printf("%s not found\n",arg);
+            printf("%s not found\n",arg_node->token);
         }
         
 

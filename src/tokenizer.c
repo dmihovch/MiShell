@@ -58,7 +58,7 @@ void print_tokens_debug(token_node* head){
         if(head->token == NULL){
             return;
         }
-        printf("{%s} ::: {%p}\n", head->token, &head->token);
+        //printf("{%s} ::: {%p}\n", head->token, &head->token);
         head = head->next;
     }
     //printf("Printed!\n");
