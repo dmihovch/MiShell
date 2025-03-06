@@ -9,7 +9,7 @@ token_node* tokenizer(char* cmd_raw){
         }
 
 
-        token_node* head = (token_node*) malloc(sizeof(token_node));
+        token_node* head = (token_node*) calloc(1,sizeof(token_node));
         head->token = strdup(tok);
         head->next = NULL;
         head->prev = NULL;
@@ -21,7 +21,7 @@ token_node* tokenizer(char* cmd_raw){
         while(tok!=NULL){
             
             //printf("\n\n Heading into the dangerzone\n\n");
-            cur -> next = (token_node*) malloc(sizeof(token_node));
+            cur -> next = (token_node*) calloc(1,sizeof(token_node));
             cur -> next -> prev = cur;
             cur -> next -> next = NULL;
             cur -> next -> token = strdup(tok);

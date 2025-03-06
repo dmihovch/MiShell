@@ -10,14 +10,14 @@ path_node* get_path(){
         if(path_elem == NULL){
             return NULL;
         }
-        path_node* head = (path_node*) malloc(sizeof(path_node));
+        path_node* head = (path_node*) calloc(1,sizeof(path_node));
         head->path = strdup(path_elem);
 
         path_node* cur = head;
         path_elem = strtok(NULL, ":");
         
         while(path_elem!=NULL){
-            cur->next = (path_node*) malloc(sizeof(path_node));
+            cur->next = (path_node*) calloc(1,sizeof(path_node));
             cur->next->path = strdup(path_elem);
             cur = cur->next;
             path_elem = strtok(NULL, ":");
