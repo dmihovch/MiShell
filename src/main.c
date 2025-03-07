@@ -8,8 +8,6 @@
 #include "../include/tokenizer.h"
 
 
-#define MAX_INPUT 1024
-
 int main(int argc, char **argv){
 
     token_node* head;

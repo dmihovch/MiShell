@@ -114,16 +114,46 @@ void list_cmd(token_node *cmd_head, path_node *path)
         directory_path = opendir(".");
         if (directory_path == NULL)
         {
-            perror("could not open directory");
+            perror("que?");//lol, this can't ever fail, right?
+            return;
         }
 
         while ((entry = readdir(directory_path)))
         {
-            puts(entry->d_name);
+            printf("%s\n",entry->d_name);
         }
     }
     char *directory_target;
+    bool only_one = true;
     while (arg != NULL && arg->token != NULL)
     {
+
+        directory_target = arg->token;
+        directory_path = opendir(directory_target);
+        if(directory_path == NULL){
+            perror("Error opening file");
+            if((arg=arg->next)!=NULL){
+                printf("\n");
+                continue;
+            }
+            break;
+        }
+
+
+
+
+        entry = readdir(directory_path);
+        
+        printf("%s:\n",directory_target);
+        
+        while(entry!=NULL){
+            printf("%s\n",entry->d_name);
+            entry = readdir(directory_path);
+        }
+        if(arg->next!=NULL){
+            printf("\n");
+        }
+
+        arg = arg->next;
     }
 }
