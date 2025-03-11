@@ -40,6 +40,7 @@ int main(int argc, char **argv){
                         todo - 
                         figure out how to do scrolling with arrow keys (cmds)
                         add null checks for each malloc and strdup
+                        at end see if I can remove the path arg from the builtins
         
         
         */

@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <dirent.h>
+#include <errno.h>
 #include "tokenizer.h"
 #include "utils.h"
 #include "exec.h"
@@ -13,5 +14,7 @@
 
 int check_builtin(token_node *, path_node *);
 void exit_cmd(token_node *, path_node *);
-void which_cmd(token_node *, path_node *);
-void list_cmd(token_node *, path_node *);
+int which_cmd(token_node *, path_node *);
+int list_cmd(token_node *, path_node *); //needs to support pipes, eventually
+int pwd_cmd(); //needs to support pipes, eventually
+int cd_cmd(token_node *); 

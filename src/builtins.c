@@ -5,6 +5,7 @@ int check_builtin(token_node *cmd_head, path_node *path)
     // printf("Entering builtin\n");
     if (cmd_head != NULL && cmd_head->token != NULL)
     {
+        int ret_code;
         // printf("%s\n",cmd_head->token);
         char *cmd = cmd_head->token;
         if (strcmp(cmd, "exit") == 0)
@@ -13,11 +14,16 @@ int check_builtin(token_node *cmd_head, path_node *path)
         }
         if (strcmp(cmd, "which") == 0)
         {
-            which_cmd(cmd_head, path);
+            ret_code = which_cmd(cmd_head, path);
         }
         if (strcmp(cmd, "list") == 0)
         {
-            list_cmd(cmd_head, path);
+            ret_code = list_cmd(cmd_head, path);
+        }
+        if(strcmp(cmd,"pwd")==0){
+
+            ret_code = pwd_cmd();
+            
         }
     }
     else
@@ -47,14 +53,13 @@ void exit_cmd(token_node *cmd_head, path_node *path)
     printf("Exiting shell with code 0, token is NULL\n"); // delete after 0 for sub
     exit(0);
 }
-
-void which_cmd(token_node *cmd_head, path_node *path)
+int which_cmd(token_node *cmd_head, path_node *path)
 {
     const char *builtin_commands[] = {"exit", "which", "list", "pwd", "cd", "pwd", "pid", "prompt"};
     token_node *arg_node = cmd_head->next;
     if (arg_node == NULL)
     {
-        return;
+        return 1;
     }
     bool found_cmd;
     while (arg_node != NULL && arg_node->token != NULL)
@@ -102,9 +107,10 @@ void which_cmd(token_node *cmd_head, path_node *path)
 
         arg_node = arg_node->next;
     }
+    return 0;
 }
 
-void list_cmd(token_node *cmd_head, path_node *path)
+int list_cmd(token_node *cmd_head, path_node *path)
 {
     token_node *arg = cmd_head->next;
     struct dirent *entry;
@@ -115,7 +121,7 @@ void list_cmd(token_node *cmd_head, path_node *path)
         if (directory_path == NULL)
         {
             perror("que?");//lol, this can't ever fail, right?
-            return;
+            return 1;
         }
 
         while ((entry = readdir(directory_path)))
@@ -156,4 +162,39 @@ void list_cmd(token_node *cmd_head, path_node *path)
 
         arg = arg->next;
     }
+    return 0;
 }
+
+int pwd_cmd(){
+    char* cwd;
+    size_t buf_size = 256;
+
+    cwd = malloc(buf_size);
+    if(cwd==NULL){
+        perror("Failed to allocate memory");
+        return 1;
+    }
+    while(getcwd(cwd,buf_size)==NULL){
+        if(errno == ERANGE){
+            buf_size *= 2;
+            char* cwd_realloc = realloc(cwd,buf_size);
+            if(cwd_realloc == NULL){
+                perror("Failed to reallocate memory");
+                free(cwd);
+                return 1;
+            }
+            cwd = cwd_realloc;
+        } else{
+            perror("getcwd error");
+            free(cwd);
+            return 1;
+        }
+    }
+
+    printf("CWD: %s\n", cwd);
+    free(cwd);
+    return 0;
+}
+
+
+
