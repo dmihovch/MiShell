@@ -23,8 +23,8 @@ int check_builtin(token_node *cmd_head, path_node *path)
         if(strcmp(cmd,"pwd")==0){
 
             ret_code = pwd_cmd();
-            
         }
+
     }
     else
     {
@@ -166,34 +166,48 @@ int list_cmd(token_node *cmd_head, path_node *path)
 }
 
 int pwd_cmd(){
-    char* cwd;
-    size_t buf_size = 256;
-
-    cwd = malloc(buf_size);
-    if(cwd==NULL){
-        perror("Failed to allocate memory");
+    char* cwd = get_cwd();
+    if(cwd == NULL){
         return 1;
     }
-    while(getcwd(cwd,buf_size)==NULL){
-        if(errno == ERANGE){
-            buf_size *= 2;
-            char* cwd_realloc = realloc(cwd,buf_size);
-            if(cwd_realloc == NULL){
-                perror("Failed to reallocate memory");
-                free(cwd);
-                return 1;
-            }
-            cwd = cwd_realloc;
-        } else{
-            perror("getcwd error");
-            free(cwd);
-            return 1;
-        }
-    }
+
+    
 
     printf("CWD: %s\n", cwd);
     free(cwd);
     return 0;
+}
+
+//mallocs cwd_buf, frees if fails, and returns 1
+char* get_cwd(){
+    char* cwd_buf;
+    size_t buf_size = 256;
+    cwd_buf = malloc(buf_size);
+    if(cwd_buf==NULL){
+        perror("Failed to allocate memory");
+        return NULL;
+    }
+    while(getcwd(cwd_buf,buf_size)==NULL){
+        if(errno == ERANGE){
+            buf_size *= 2;
+            char* cwd_realloc = realloc(cwd_buf,buf_size);
+            if(cwd_realloc == NULL){
+                perror("Failed to reallocate memory");
+                free(cwd_buf);
+                return NULL;
+            }
+            cwd_buf = cwd_realloc;
+        } else{
+            perror("getcwd error");
+            free(cwd_buf);
+            return NULL;
+        }
+    }
+    return cwd_buf;
+}
+
+int cd_cmd(token_node* cmd_head){
+
 }
 
 

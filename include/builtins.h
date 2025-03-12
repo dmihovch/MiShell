@@ -17,4 +17,5 @@ void exit_cmd(token_node *, path_node *);
 int which_cmd(token_node *, path_node *);
 int list_cmd(token_node *, path_node *); //needs to support pipes, eventually
 int pwd_cmd(); //needs to support pipes, eventually
-int cd_cmd(token_node *); 
+int cd_cmd(token_node *);
+char* get_cwd();
