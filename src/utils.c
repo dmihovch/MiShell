@@ -47,3 +47,15 @@ void print_path_debug(path_node* head){
         head=head->next;
     }
 }
+
+void free_all_mallocs(token_node* cmd_head, path_node* path, char* previous_directory){
+    if(cmd_head != NULL){
+        free_tokens(cmd_head);
+    }
+    if(path!=NULL){
+        free_path(path);
+    }
+    if(previous_directory!=NULL){
+        free(previous_directory);
+    }
+}

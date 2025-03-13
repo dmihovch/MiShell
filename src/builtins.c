@@ -1,6 +1,6 @@
 #include "../include/builtins.h"
 
-int check_builtin(token_node *cmd_head, path_node *path)
+int check_builtin(token_node *cmd_head, path_node *path, char* previous_directory)
 {
     // printf("Entering builtin\n");
     if (cmd_head != NULL && cmd_head->token != NULL)
@@ -36,7 +36,7 @@ int check_builtin(token_node *cmd_head, path_node *path)
 }
 
 // should be good
-void exit_cmd(token_node *cmd_head, path_node *path)
+void exit_cmd(token_node *cmd_head, path_node *path, char* previous_directory)
 {
     token_node *arg_node = cmd_head->next;
     int ret_code;
@@ -46,10 +46,12 @@ void exit_cmd(token_node *cmd_head, path_node *path)
         printf("Exiting shell with code %d\n", ret_code);
         free_tokens(cmd_head);
         free_path(path);
+        free(previous_directory);
         exit(ret_code);
     }
     free_tokens(cmd_head);
     free_path(path);
+    free(previous_directory);
     printf("Exiting shell with code 0, token is NULL\n"); // delete after 0 for sub
     exit(0);
 }
@@ -206,7 +208,7 @@ char* get_cwd(){
     return cwd_buf;
 }
 
-int cd_cmd(token_node* cmd_head){
+int cd_cmd(token_node* cmd_head, char* prev_directory){
 
 }
 

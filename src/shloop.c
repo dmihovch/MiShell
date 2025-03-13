@@ -17,8 +17,7 @@ int shell_loop(){
 
     path_node* path = get_path();
 
-    char* previous_directory;
-    char* current_directory;
+    char* previous_directory = get_cwd();
     //MUST FIGURE THIS OuT
 
 
@@ -68,12 +67,13 @@ int shell_loop(){
             continue;
         }
         //print_tokens_debug(head);
-        return_code = check_builtin(head,path);
+        return_code = check_builtin(head,path,previous_directory);
         //check for return codes, to see what is next
 
 
 
         free_tokens(head);
+        free(previous_directory);
 
 
 
