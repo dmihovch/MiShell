@@ -1,6 +1,6 @@
 #include "../include/builtins.h"
 
-int check_builtin(token_node *cmd_head, path_node *path, char* previous_directory)
+int check_builtin(token_node *cmd_head, path_node *path, char *previous_directory)
 {
     // printf("Entering builtin\n");
     if (cmd_head != NULL && cmd_head->token != NULL)
@@ -20,11 +20,11 @@ int check_builtin(token_node *cmd_head, path_node *path, char* previous_director
         {
             ret_code = list_cmd(cmd_head, path);
         }
-        if(strcmp(cmd,"pwd")==0){
+        if (strcmp(cmd, "pwd") == 0)
+        {
 
             ret_code = pwd_cmd();
         }
-
     }
     else
     {
@@ -36,7 +36,7 @@ int check_builtin(token_node *cmd_head, path_node *path, char* previous_director
 }
 
 // should be good
-void exit_cmd(token_node *cmd_head, path_node *path, char* previous_directory)
+void exit_cmd(token_node *cmd_head, path_node *path, char *previous_directory)
 {
     token_node *arg_node = cmd_head->next;
     int ret_code;
@@ -44,14 +44,10 @@ void exit_cmd(token_node *cmd_head, path_node *path, char* previous_directory)
     {
         ret_code = atoi(arg_node->token);
         printf("Exiting shell with code %d\n", ret_code);
-        free_tokens(cmd_head);
-        free_path(path);
-        free(previous_directory);
+        free_all_mallocs(cmd_head, path, previous_directory);
         exit(ret_code);
     }
-    free_tokens(cmd_head);
-    free_path(path);
-    free(previous_directory);
+    free_all_mallocs(cmd_head, path, previous_directory);
     printf("Exiting shell with code 0, token is NULL\n"); // delete after 0 for sub
     exit(0);
 }
@@ -122,13 +118,13 @@ int list_cmd(token_node *cmd_head, path_node *path)
         directory_path = opendir(".");
         if (directory_path == NULL)
         {
-            perror("que?");//lol, this can't ever fail, right?
+            perror("que?"); // lol, this can't ever fail, right?
             return 1;
         }
 
         while ((entry = readdir(directory_path)))
         {
-            printf("%s\n",entry->d_name);
+            printf("%s\n", entry->d_name);
         }
     }
     char *directory_target;
@@ -138,27 +134,28 @@ int list_cmd(token_node *cmd_head, path_node *path)
 
         directory_target = arg->token;
         directory_path = opendir(directory_target);
-        if(directory_path == NULL){
+        if (directory_path == NULL)
+        {
             perror("Error opening file");
-            if((arg=arg->next)!=NULL){
+            if ((arg = arg->next) != NULL)
+            {
                 printf("\n");
                 continue;
             }
             break;
         }
 
-
-
-
         entry = readdir(directory_path);
-        
-        printf("%s:\n",directory_target);
-        
-        while(entry!=NULL){
-            printf("%s\n",entry->d_name);
+
+        printf("%s:\n", directory_target);
+
+        while (entry != NULL)
+        {
+            printf("%s\n", entry->d_name);
             entry = readdir(directory_path);
         }
-        if(arg->next!=NULL){
+        if (arg->next != NULL)
+        {
             printf("\n");
         }
 
@@ -167,50 +164,65 @@ int list_cmd(token_node *cmd_head, path_node *path)
     return 0;
 }
 
-int pwd_cmd(){
-    char* cwd = get_cwd();
-    if(cwd == NULL){
+int pwd_cmd()
+{
+    char *cwd = get_cwd();
+    if (cwd == NULL)
+    {
         return 1;
     }
-
-    
 
     printf("CWD: %s\n", cwd);
     free(cwd);
     return 0;
 }
 
-//mallocs cwd_buf, frees if fails, and returns 1
-char* get_cwd(){
-    char* cwd_buf;
+// mallocs cwd_buf, frees if fails, and returns 1
+int get_cwd(char *cwd_buf)
+{
+    if (cwd_buf != NULL)
+    {
+        free(cwd_buf);
+    }
     size_t buf_size = 256;
     cwd_buf = malloc(buf_size);
-    if(cwd_buf==NULL){
+    if (cwd_buf == NULL)
+    {
         perror("Failed to allocate memory");
-        return NULL;
+        return 1;
     }
-    while(getcwd(cwd_buf,buf_size)==NULL){
-        if(errno == ERANGE){
+    while (getcwd(cwd_buf, buf_size) == NULL)
+    {
+        if (errno == ERANGE)
+        {
             buf_size *= 2;
-            char* cwd_realloc = realloc(cwd_buf,buf_size);
-            if(cwd_realloc == NULL){
+            char *cwd_realloc = realloc(cwd_buf, buf_size);
+            if (cwd_realloc == NULL)
+            {
                 perror("Failed to reallocate memory");
                 free(cwd_buf);
-                return NULL;
+                return 1;
             }
             cwd_buf = cwd_realloc;
-        } else{
+        }
+        else
+        {
             perror("getcwd error");
             free(cwd_buf);
-            return NULL;
+            return 1;
         }
     }
-    return cwd_buf;
+    return buf_size;
 }
 
-int cd_cmd(token_node* cmd_head, char* prev_directory){
+int cd_cmd(token_node *cmd_head, char *prev_directory)
+{
+    char *tmp_prev_directory = NULL;
+    int buf_size = get_cwd(tmp_prev_directory);
+    if (tmp_prev_directory != NULL)
+    {
+        memcpy(prev_directory, tmp_prev_directory, buf_size);
+    }
 
+    return 0;
 }
-
-
-
