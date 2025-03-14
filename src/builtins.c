@@ -324,7 +324,7 @@ int setenv_cmd(token_node* cmd_head, path_node** path){
         return 1;
     }
     token_node* env_var = cmd_head->next;
-    if(env_var->token != NULL && env_var->next != NULL && env_var->next->token != NULL){
+    if(env_var->token != NULL && env_var->next != NULL && env_var->next->token != NULL && env_var->next->next == NULL){
         if(strcmp(env_var->token,"PATH")==0){
             free_path(path);
         }
