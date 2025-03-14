@@ -14,11 +14,11 @@ int check_builtin(token_node *cmd_head, path_node **path, char **previous_direct
         }
         if (strcmp(cmd, "which") == 0)
         {
-            ret_code = which_cmd(cmd_head, path);
+            ret_code = which_cmd(cmd_head, *path);
         }
         if (strcmp(cmd, "list") == 0)
         {
-            ret_code = list_cmd(cmd_head, path);
+            ret_code = list_cmd(cmd_head, *path);
         }
         if (strcmp(cmd, "pwd") == 0)
         {

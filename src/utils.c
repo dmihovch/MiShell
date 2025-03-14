@@ -70,7 +70,7 @@ void free_all_mallocs(token_node *cmd_head, path_node **path, char **previous_di
     }
     if (path != NULL && *path != NULL)
     {
-        free_path(*path);
+        free_path(path);
     }
     if (previous_directory != NULL && *previous_directory != NULL)
     {
