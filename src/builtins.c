@@ -1,6 +1,6 @@
 #include "../include/builtins.h"
 
-int check_builtin(token_node *cmd_head, path_node *path, char **previous_directory)
+int check_builtin(token_node *cmd_head, path_node *path, char **previous_directory, char** current_directory)
 {
     // printf("Entering builtin\n");
     if (cmd_head != NULL && cmd_head->token != NULL)
@@ -42,7 +42,7 @@ int check_builtin(token_node *cmd_head, path_node *path, char **previous_directo
 }
 
 // should be good
-void exit_cmd(token_node *cmd_head, path_node *path, char **previous_directory)
+void exit_cmd(token_node *cmd_head, path_node *path, char **previous_directory, char **current_directory)
 {
     token_node *arg_node = cmd_head->next;
     int ret_code;
@@ -183,10 +183,10 @@ int pwd_cmd()
     return 0;
 }
 
-int cd_cmd(token_node *cmd_head, char **prev_directory)
+int cd_cmd(token_node *cmd_head, char **prev_directory, char **current_directory)
 {
 
-    printf("Directory was: %s\n", getcwd(NULL, 0));
+    //printf("Directory was: %s\n", getcwd(NULL, 0));
     int ret_code;
 
     if (cmd_head->next == NULL)
@@ -228,26 +228,8 @@ int cd_cmd(token_node *cmd_head, char **prev_directory)
         }
     }
 
-    printf("Directory is now: %s\n", getcwd(NULL, 0));
 
-    /*
-
-    \/ does not currently work
-
-    */
-
-    // updates previous_directory in shell_loop if applicable
-    char *tmp_prev_directory = getcwd(NULL, 0);
-    if (tmp_prev_directory != NULL && *prev_directory != NULL)
-    { // both not NULL
-        strcpy(*prev_directory, tmp_prev_directory);
-        free(tmp_prev_directory);
-        tmp_prev_directory = NULL;
-    }
-    if (tmp_prev_directory != NULL)
-    {
-        free(tmp_prev_directory);
-    }
+    //need to implement prev-directory stuff
 
     return 0;
 }

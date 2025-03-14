@@ -15,13 +15,21 @@ int shell_loop()
 
     path_node *path = get_path();
 
-    char *previous_directory = getcwd(NULL, 0);
-    if (previous_directory == NULL)
+    char* previous_directory = getcwd(NULL, 0);
+    char* current_directory = getcwd(NULL,0);
+    if (previous_directory == NULL )
     {
         printf("Previous directory in shloop getcwd failed\n");
         return 1;
     }
+    if(current_directory == NULL){
+        printf("Current directory in shloop getcwd failed\n");
+        return 1;
+    }
 
+
+    char* prompt; //want to change this
+    char* user = "Dan";
     // MUST FIGURE THIS OuT
 
     // print_path_debug(path);
@@ -47,7 +55,11 @@ int shell_loop()
         */
 
         // reads in prompt and gets rid of newline
-        printf("$ ");
+        prompt = malloc(256);
+        sprintf(prompt,"%s:%s$ ",user,current_directory);
+        printf("%s",prompt);
+        free(prompt);
+
         num_read = getline(&cmd_raw, &cmd_len, stdin);
         if (num_read == 1)
         { // handles just hitting enter
