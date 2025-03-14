@@ -17,7 +17,7 @@ int shell_loop()
 
     char* previous_directory = getcwd(NULL, 0);
     char* current_directory = getcwd(NULL,0);
-    if (previous_directory == NULL )
+    if (previous_directory == NULL)
     {
         printf("Previous directory in shloop getcwd failed\n");
         return 1;
@@ -27,7 +27,7 @@ int shell_loop()
         return 1;
     }
 
-
+    char* prompt_prefix = NULL;
     char* prompt; //want to change this
     char* user = "Dan";
     // MUST FIGURE THIS OuT
@@ -55,23 +55,20 @@ int shell_loop()
         */
 
         // reads in prompt and gets rid of newline
-        prompt = malloc(256);
-        sprintf(prompt,"%s:%s$ ",user,current_directory);
+        prompt = malloc(256); // need this to be dynamic
+
+        if(prompt_prefix == NULL){
+            sprintf(prompt,"%s $ ",current_directory);
+        }
+        if(prompt_prefix != NULL){
+            sprintf(prompt, "%s:%s $ ",prompt_prefix,current_directory);
+        }
         printf("%s",prompt);
         free(prompt);
 
-        num_read = getline(&cmd_raw, &cmd_len, stdin);
-        if (num_read == 1)
-        { // handles just hitting enter
-            free(cmd_raw);
+        num_read = get_input(&cmd_raw,&cmd_len);
+        if(num_read == 1 || cmd_raw == NULL){
             continue;
-        }
-        if (num_read != -1)
-        { // replaces newline with null terminator
-            if (cmd_raw[num_read - 1] == '\n')
-            {
-                cmd_raw[num_read - 1] = '\0';
-            }
         }
 
         head = tokenizer(cmd_raw);
@@ -81,13 +78,13 @@ int shell_loop()
             continue;
         }
         // print_tokens_debug(head);
-        return_code = check_builtin(head, path, &previous_directory);
+        return_code = check_builtin(head, path, &previous_directory, &current_directory, &prompt_prefix);
         // check for return codes, to see what is next
 
         free_tokens(head);
     }
 
-    free_all_mallocs(head, path, &previous_directory); // just in case
+    free_all_mallocs(head, path, &previous_directory, &current_directory, &prompt_prefix); // just in case
 
     printf("\n\n\n\n\nTHIS SHOULD NEVER? PRINT!!\n\n\n\n\n");
     return 0;

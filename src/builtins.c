@@ -1,6 +1,6 @@
 #include "../include/builtins.h"
 
-int check_builtin(token_node *cmd_head, path_node *path, char **previous_directory, char** current_directory)
+int check_builtin(token_node *cmd_head, path_node *path, char **previous_directory, char** current_directory, char** prompt_prefix)
 {
     // printf("Entering builtin\n");
     if (cmd_head != NULL && cmd_head->token != NULL)
@@ -10,7 +10,7 @@ int check_builtin(token_node *cmd_head, path_node *path, char **previous_directo
         char *cmd = cmd_head->token;
         if (strcmp(cmd, "exit") == 0)
         {
-            exit_cmd(cmd_head, path, previous_directory);
+            exit_cmd(cmd_head, path, previous_directory, current_directory, prompt_prefix);
         }
         if (strcmp(cmd, "which") == 0)
         {
@@ -27,9 +27,12 @@ int check_builtin(token_node *cmd_head, path_node *path, char **previous_directo
         }
         if (strcmp(cmd, "cd") == 0)
         {
-            printf("previous directory in builtin: %s\n", *previous_directory);
-            ret_code = cd_cmd(cmd_head, previous_directory);
-            printf("previous directory in builtin after cd cmd: %s\n", *previous_directory);
+            //printf("previous directory in builtin: %s\n", *previous_directory);
+            ret_code = cd_cmd(cmd_head, previous_directory, current_directory);
+            //printf("previous directory in builtin after cd cmd: %s\n", *previous_directory);
+        }
+        if(strcmp(cmd, "prompt") == 0){
+            ret_code = prompt_cmd(cmd_head, prompt_prefix);
         }
     }
     else
@@ -42,7 +45,7 @@ int check_builtin(token_node *cmd_head, path_node *path, char **previous_directo
 }
 
 // should be good
-void exit_cmd(token_node *cmd_head, path_node *path, char **previous_directory, char **current_directory)
+void exit_cmd(token_node *cmd_head, path_node *path, char **previous_directory, char **current_directory, char** prompt_prefix)
 {
     token_node *arg_node = cmd_head->next;
     int ret_code;
@@ -50,10 +53,10 @@ void exit_cmd(token_node *cmd_head, path_node *path, char **previous_directory, 
     {
         ret_code = atoi(arg_node->token);
         printf("Exiting shell with code %d\n", ret_code);
-        free_all_mallocs(cmd_head, path, previous_directory);
+        free_all_mallocs(cmd_head, path, previous_directory, current_directory, prompt_prefix);
         exit(ret_code);
     }
-    free_all_mallocs(cmd_head, path, previous_directory);
+    free_all_mallocs(cmd_head, path, previous_directory, current_directory, prompt_prefix);
     printf("Exiting shell with code 0, token is NULL\n"); // delete after 0 for sub
     exit(0);
 }
@@ -167,6 +170,9 @@ int list_cmd(token_node *cmd_head, path_node *path)
 
         arg = arg->next;
     }
+    if(directory_path != NULL){
+        closedir(directory_path);
+    }
     return 0;
 }
 
@@ -186,6 +192,8 @@ int pwd_cmd()
 int cd_cmd(token_node *cmd_head, char **prev_directory, char **current_directory)
 {
 
+    char* tmp_current_directory = strdup(*current_directory);
+
     //printf("Directory was: %s\n", getcwd(NULL, 0));
     int ret_code;
 
@@ -202,8 +210,11 @@ int cd_cmd(token_node *cmd_head, char **prev_directory, char **current_directory
         if (ret_code != 0)
         {
             perror("Failed to CD to ~");
+            free(tmp_current_directory);
             return 1;
         }
+
+
     }
 
     if (cmd_head->next != NULL && cmd_head->next->token != NULL)
@@ -214,6 +225,7 @@ int cd_cmd(token_node *cmd_head, char **prev_directory, char **current_directory
             if (ret_code != 0)
             {
                 perror("Failed to CD to prev directory");
+                free(tmp_current_directory);
                 return 1;
             }
         }
@@ -223,13 +235,38 @@ int cd_cmd(token_node *cmd_head, char **prev_directory, char **current_directory
             if (ret_code != 0)
             {
                 printf("Unable to CD into: %s\n", cmd_head->next->token);
+                free(tmp_current_directory);
                 return 1;
             }
         }
     }
 
+    //successful cd
+    reassign_current_and_previous_directory(current_directory,prev_directory,&tmp_current_directory);
+    
+
 
     //need to implement prev-directory stuff
 
     return 0;
+}
+
+int prompt_cmd(token_node* cmd_head, char** prompt_prefix){
+    if(*prompt_prefix != NULL){
+        free(*prompt_prefix);
+    }
+    if(cmd_head->next == NULL){
+        size_t prompt_len = 0;
+        ssize_t num_read = get_input(prompt_prefix,&prompt_len);
+        if(num_read == 1 || *prompt_prefix == NULL){
+            return 1;
+        }
+        return 0;
+    }
+    if(cmd_head->next!=NULL && cmd_head->next->token != NULL){
+        *prompt_prefix = strdup(cmd_head->next->token);
+        return 0;
+    }
+    printf("SOmething went wrong in prompt_cmd\n\n");
+    return 1;
 }
