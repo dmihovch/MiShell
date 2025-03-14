@@ -61,7 +61,7 @@ int shell_loop()
             sprintf(prompt,"%s $ ",current_directory);
         }
         if(prompt_prefix != NULL){
-            sprintf(prompt, "%s:%s $ ",prompt_prefix,current_directory);
+            sprintf(prompt, "%s@%s $ ",prompt_prefix,current_directory);
         }
         printf("%s",prompt);
         free(prompt);
@@ -78,13 +78,13 @@ int shell_loop()
             continue;
         }
         // print_tokens_debug(head);
-        return_code = check_builtin(head, path, &previous_directory, &current_directory, &prompt_prefix);
+        return_code = check_builtin(head, &path, &previous_directory, &current_directory, &prompt_prefix);
         // check for return codes, to see what is next
 
         free_tokens(head);
     }
 
-    free_all_mallocs(head, path, &previous_directory, &current_directory, &prompt_prefix); // just in case
+    free_all_mallocs(head, &path, &previous_directory, &current_directory, &prompt_prefix); // just in case
 
     printf("\n\n\n\n\nTHIS SHOULD NEVER? PRINT!!\n\n\n\n\n");
     return 0;

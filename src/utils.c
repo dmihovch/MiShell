@@ -31,9 +31,9 @@ path_node *get_path()
     return NULL;
 }
 
-void free_path(path_node *head)
+void free_path(path_node **head)
 {
-    path_node *cur = head;
+    path_node *cur = *head;
     path_node *tmp = NULL;
     while (cur != NULL)
     {
@@ -42,11 +42,17 @@ void free_path(path_node *head)
         if (tmp->path != NULL)
         {
             free(tmp->path);
+
         }
         free(tmp);
+        
     }
+
+    *head = NULL;
+    
 }
 
+//if calling this, need to deref path
 void print_path_debug(path_node *head)
 {
     while (head != NULL && head->path != NULL)
@@ -56,15 +62,15 @@ void print_path_debug(path_node *head)
     }
 }
 
-void free_all_mallocs(token_node *cmd_head, path_node *path, char **previous_directory, char **current_directory, char** prompt_prefix)
+void free_all_mallocs(token_node *cmd_head, path_node **path, char **previous_directory, char **current_directory, char** prompt_prefix)
 {
     if (cmd_head != NULL)
     {
         free_tokens(cmd_head);
     }
-    if (path != NULL)
+    if (path != NULL && *path != NULL)
     {
-        free_path(path);
+        free_path(*path);
     }
     if (previous_directory != NULL && *previous_directory != NULL)
     {
@@ -109,4 +115,13 @@ int get_input(char** cmd_raw,size_t* cmd_len){
         return num_read;
     }
     return num_read;
+}
+
+void print_whole_environment(){
+    extern char **__environ;
+    char **env = __environ;
+    while(*env != NULL){
+        printf("%s\n", *env);
+        ++env;
+    }
 }

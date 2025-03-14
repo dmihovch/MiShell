@@ -1,6 +1,6 @@
 #include "../include/builtins.h"
 
-int check_builtin(token_node *cmd_head, path_node *path, char **previous_directory, char** current_directory, char** prompt_prefix)
+int check_builtin(token_node *cmd_head, path_node **path, char **previous_directory, char** current_directory, char** prompt_prefix)
 {
     // printf("Entering builtin\n");
     if (cmd_head != NULL && cmd_head->token != NULL)
@@ -34,6 +34,15 @@ int check_builtin(token_node *cmd_head, path_node *path, char **previous_directo
         if(strcmp(cmd, "prompt") == 0){
             ret_code = prompt_cmd(cmd_head, prompt_prefix);
         }
+        if(strcmp(cmd, "pid")== 0){
+            pid_cmd();
+        }
+        if(strcmp(cmd, "printenv") == 0){
+            ret_code = printenv_cmd(cmd_head);
+        }
+        if(strcmp(cmd, "setenv") == 0){
+            ret_code = setenv_cmd(cmd_head,path);
+        }
     }
     else
     {
@@ -45,7 +54,7 @@ int check_builtin(token_node *cmd_head, path_node *path, char **previous_directo
 }
 
 // should be good
-void exit_cmd(token_node *cmd_head, path_node *path, char **previous_directory, char **current_directory, char** prompt_prefix)
+void exit_cmd(token_node *cmd_head, path_node **path, char **previous_directory, char **current_directory, char** prompt_prefix)
 {
     token_node *arg_node = cmd_head->next;
     int ret_code;
@@ -257,6 +266,7 @@ int prompt_cmd(token_node* cmd_head, char** prompt_prefix){
     }
     if(cmd_head->next == NULL){
         size_t prompt_len = 0;
+        printf("Enter new prompt prefix: ");
         ssize_t num_read = get_input(prompt_prefix,&prompt_len);
         if(num_read == 1 || *prompt_prefix == NULL){
             return 1;
@@ -269,4 +279,66 @@ int prompt_cmd(token_node* cmd_head, char** prompt_prefix){
     }
     printf("SOmething went wrong in prompt_cmd\n\n");
     return 1;
+}
+
+void pid_cmd(){
+    printf("Current Process ID: %d\n", getpid());
+}
+
+int printenv_cmd(token_node* cmd_head){
+    if(cmd_head->next == NULL){
+        print_whole_environment();
+        return 0;
+    }
+    token_node* arg = cmd_head->next;
+    while(arg != NULL && arg->token != NULL){
+        char* environment_variable = getenv(arg->token);
+        if(environment_variable != NULL){
+            printf("%s=%s\n",arg->token,environment_variable);
+        }
+        else{
+            printf("No variable: %s\n", arg->token);
+        }
+        arg=arg->next;
+    }
+    return 0;
+}
+
+int setenv_cmd(token_node* cmd_head, path_node** path){
+    if(cmd_head->next == NULL){
+        print_whole_environment();
+        return 0;
+    }
+    if(cmd_head->next != NULL && cmd_head->next->token != NULL && cmd_head->next->next == NULL){
+        if(strcmp(cmd_head->next->token,"PATH") == 0){
+            free_path(path);
+        }
+        if(setenv(cmd_head->next->token,"",1)==0){
+            printf("%s is set to: [%s]\n", cmd_head->next->token,getenv(cmd_head->next->token));
+            if(*path == NULL){
+                *path = get_path();
+            }
+            return 0;
+        }
+        perror("setenv failure");
+        return 1;
+    }
+    token_node* env_var = cmd_head->next;
+    if(env_var->token != NULL && env_var->next != NULL && env_var->next->token != NULL){
+        if(strcmp(env_var->token,"PATH")==0){
+            free_path(path);
+        }
+        if(setenv(env_var->token,env_var->next->token,1)==0){
+            printf("%s is set to: [%s]\n", env_var->token, getenv(env_var->token));
+            if(*path == NULL){
+                *path = get_path();
+            }
+            return 0;
+        }
+        perror("setenv failure");
+        return 1;
+    }
+    fprintf(stderr, "Error: Too many arguments passed to setenv\n");
+    return 1;
+    
 }
