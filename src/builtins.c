@@ -1,6 +1,6 @@
 #include "../include/builtins.h"
 
-int check_builtin(token_node *cmd_head, path_node *path, char *previous_directory)
+int check_builtin(token_node *cmd_head, path_node *path, char **previous_directory)
 {
     // printf("Entering builtin\n");
     if (cmd_head != NULL && cmd_head->token != NULL)
@@ -10,7 +10,7 @@ int check_builtin(token_node *cmd_head, path_node *path, char *previous_director
         char *cmd = cmd_head->token;
         if (strcmp(cmd, "exit") == 0)
         {
-            exit_cmd(cmd_head, path);
+            exit_cmd(cmd_head, path, previous_directory);
         }
         if (strcmp(cmd, "which") == 0)
         {
@@ -25,6 +25,12 @@ int check_builtin(token_node *cmd_head, path_node *path, char *previous_director
 
             ret_code = pwd_cmd();
         }
+        if (strcmp(cmd, "cd") == 0)
+        {
+            printf("previous directory in builtin: %s\n", *previous_directory);
+            ret_code = cd_cmd(cmd_head, previous_directory);
+            printf("previous directory in builtin after cd cmd: %s\n", *previous_directory);
+        }
     }
     else
     {
@@ -36,7 +42,7 @@ int check_builtin(token_node *cmd_head, path_node *path, char *previous_director
 }
 
 // should be good
-void exit_cmd(token_node *cmd_head, path_node *path, char *previous_directory)
+void exit_cmd(token_node *cmd_head, path_node *path, char **previous_directory)
 {
     token_node *arg_node = cmd_head->next;
     int ret_code;
@@ -166,7 +172,7 @@ int list_cmd(token_node *cmd_head, path_node *path)
 
 int pwd_cmd()
 {
-    char *cwd = get_cwd();
+    char *cwd = getcwd(NULL, 0);
     if (cwd == NULL)
     {
         return 1;
@@ -177,51 +183,70 @@ int pwd_cmd()
     return 0;
 }
 
-// mallocs cwd_buf, frees if fails, and returns 1
-int get_cwd(char *cwd_buf)
+int cd_cmd(token_node *cmd_head, char **prev_directory)
 {
-    if (cwd_buf != NULL)
+
+    printf("Directory was: %s\n", getcwd(NULL, 0));
+    int ret_code;
+
+    if (cmd_head->next == NULL)
     {
-        free(cwd_buf);
-    }
-    size_t buf_size = 256;
-    cwd_buf = malloc(buf_size);
-    if (cwd_buf == NULL)
-    {
-        perror("Failed to allocate memory");
-        return 1;
-    }
-    while (getcwd(cwd_buf, buf_size) == NULL)
-    {
-        if (errno == ERANGE)
+
+        char *home = getenv("HOME");
+        if (home == NULL)
         {
-            buf_size *= 2;
-            char *cwd_realloc = realloc(cwd_buf, buf_size);
-            if (cwd_realloc == NULL)
-            {
-                perror("Failed to reallocate memory");
-                free(cwd_buf);
-                return 1;
-            }
-            cwd_buf = cwd_realloc;
+            printf("HOME is NULL\n");
         }
-        else
+        ret_code = chdir(home);
+
+        if (ret_code != 0)
         {
-            perror("getcwd error");
-            free(cwd_buf);
+            perror("Failed to CD to ~");
             return 1;
         }
     }
-    return buf_size;
-}
 
-int cd_cmd(token_node *cmd_head, char *prev_directory)
-{
-    char *tmp_prev_directory = NULL;
-    int buf_size = get_cwd(tmp_prev_directory);
+    if (cmd_head->next != NULL && cmd_head->next->token != NULL)
+    {
+        if (strcmp(cmd_head->next->token, "-") == 0)
+        {
+            ret_code = chdir(*prev_directory);
+            if (ret_code != 0)
+            {
+                perror("Failed to CD to prev directory");
+                return 1;
+            }
+        }
+        else
+        {
+            ret_code = chdir(cmd_head->next->token);
+            if (ret_code != 0)
+            {
+                printf("Unable to CD into: %s\n", cmd_head->next->token);
+                return 1;
+            }
+        }
+    }
+
+    printf("Directory is now: %s\n", getcwd(NULL, 0));
+
+    /*
+
+    \/ does not currently work
+
+    */
+
+    // updates previous_directory in shell_loop if applicable
+    char *tmp_prev_directory = getcwd(NULL, 0);
+    if (tmp_prev_directory != NULL && *prev_directory != NULL)
+    { // both not NULL
+        strcpy(*prev_directory, tmp_prev_directory);
+        free(tmp_prev_directory);
+        tmp_prev_directory = NULL;
+    }
     if (tmp_prev_directory != NULL)
     {
-        memcpy(prev_directory, tmp_prev_directory, buf_size);
+        free(tmp_prev_directory);
     }
 
     return 0;

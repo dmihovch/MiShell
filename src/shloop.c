@@ -15,7 +15,13 @@ int shell_loop()
 
     path_node *path = get_path();
 
-    char *previous_directory = get_cwd();
+    char *previous_directory = getcwd(NULL, 0);
+    if (previous_directory == NULL)
+    {
+        printf("Previous directory in shloop getcwd failed\n");
+        return 1;
+    }
+
     // MUST FIGURE THIS OuT
 
     // print_path_debug(path);
@@ -63,13 +69,13 @@ int shell_loop()
             continue;
         }
         // print_tokens_debug(head);
-        return_code = check_builtin(head, path, previous_directory);
+        return_code = check_builtin(head, path, &previous_directory);
         // check for return codes, to see what is next
 
         free_tokens(head);
     }
 
-    free_all_mallocs(head, path, previous_directory); // just in case
+    free_all_mallocs(head, path, &previous_directory); // just in case
 
     printf("\n\n\n\n\nTHIS SHOULD NEVER? PRINT!!\n\n\n\n\n");
     return 0;

@@ -1,5 +1,8 @@
 CC=gcc
 
+debug:
+	@$(CC) -g -fsanitize=address -o sh src/shloop.c src/exec.c src/builtins.c  src/main.c src/tokenizer.c src/utils.c
+
 sh:
 	@$(CC) -o sh src/shloop.c src/exec.c src/builtins.c  src/main.c src/tokenizer.c src/utils.c
 

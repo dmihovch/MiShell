@@ -56,7 +56,7 @@ void print_path_debug(path_node *head)
     }
 }
 
-void free_all_mallocs(token_node *cmd_head, path_node *path, char *previous_directory)
+void free_all_mallocs(token_node *cmd_head, path_node *path, char **previous_directory)
 {
     if (cmd_head != NULL)
     {
@@ -66,8 +66,8 @@ void free_all_mallocs(token_node *cmd_head, path_node *path, char *previous_dire
     {
         free_path(path);
     }
-    if (previous_directory != NULL)
+    if (previous_directory != NULL && *previous_directory != NULL)
     {
-        free(previous_directory);
+        free(*previous_directory);
     }
 }
