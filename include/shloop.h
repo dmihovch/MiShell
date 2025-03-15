@@ -6,4 +6,4 @@
 #include "../include/builtins.h"
 #include "../include/exec.h"
 #include "../include/tokenizer.h"
-int shell_loop();
+int shell_loop(FILE *);

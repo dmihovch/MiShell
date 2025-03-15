@@ -14,4 +14,7 @@ clean:
 runv: sh
 	@- valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./sh
 
+runv-test: sh test
+	@- valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./sh test
+
 

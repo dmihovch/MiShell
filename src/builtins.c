@@ -1,6 +1,6 @@
 #include "../include/builtins.h"
 
-int check_builtin(token_node *cmd_head, path_node **path, char **previous_directory, char** current_directory, char** prompt_prefix)
+int check_builtin(token_node *cmd_head, path_node **path, char **previous_directory, char** current_directory, char** prompt_prefix, FILE* input)
 {
     // printf("Entering builtin\n");
     if (cmd_head != NULL && cmd_head->token != NULL)
@@ -10,7 +10,7 @@ int check_builtin(token_node *cmd_head, path_node **path, char **previous_direct
         char *cmd = cmd_head->token;
         if (strcmp(cmd, "exit") == 0)
         {
-            exit_cmd(cmd_head, path, previous_directory, current_directory, prompt_prefix);
+            exit_cmd(cmd_head, path, previous_directory, current_directory, prompt_prefix, input);
         }
         if (strcmp(cmd, "which") == 0)
         {
@@ -31,7 +31,7 @@ int check_builtin(token_node *cmd_head, path_node **path, char **previous_direct
             ret_code = cd_cmd(cmd_head, previous_directory, current_directory);
             //printf("previous directory in builtin after cd cmd: %s\n", *previous_directory);
         }
-        if(strcmp(cmd, "prompt") == 0){
+        if((strcmp(cmd, "prompt") == 0) && input == stdin){
             ret_code = prompt_cmd(cmd_head, prompt_prefix);
         }
         if(strcmp(cmd, "pid")== 0){
@@ -54,7 +54,7 @@ int check_builtin(token_node *cmd_head, path_node **path, char **previous_direct
 }
 
 // should be good
-void exit_cmd(token_node *cmd_head, path_node **path, char **previous_directory, char **current_directory, char** prompt_prefix)
+void exit_cmd(token_node *cmd_head, path_node **path, char **previous_directory, char **current_directory, char** prompt_prefix, FILE* input)
 {
     token_node *arg_node = cmd_head->next;
     int ret_code;
@@ -62,10 +62,10 @@ void exit_cmd(token_node *cmd_head, path_node **path, char **previous_directory,
     {
         ret_code = atoi(arg_node->token);
         printf("Exiting shell with code %d\n", ret_code);
-        free_all_mallocs(cmd_head, path, previous_directory, current_directory, prompt_prefix);
+        free_all_mallocs(cmd_head, path, previous_directory, current_directory, prompt_prefix,input);
         exit(ret_code);
     }
-    free_all_mallocs(cmd_head, path, previous_directory, current_directory, prompt_prefix);
+    free_all_mallocs(cmd_head, path, previous_directory, current_directory, prompt_prefix,input);
     printf("Exiting shell with code 0, token is NULL\n"); // delete after 0 for sub
     exit(0);
 }
@@ -267,7 +267,7 @@ int prompt_cmd(token_node* cmd_head, char** prompt_prefix){
     if(cmd_head->next == NULL){
         size_t prompt_len = 0;
         printf("Enter new prompt prefix: ");
-        ssize_t num_read = get_input(prompt_prefix,&prompt_len);
+        ssize_t num_read = get_input(prompt_prefix,&prompt_len,stdin);
         if(num_read == 1 || *prompt_prefix == NULL){
             return 1;
         }
@@ -277,7 +277,7 @@ int prompt_cmd(token_node* cmd_head, char** prompt_prefix){
         *prompt_prefix = strdup(cmd_head->next->token);
         return 0;
     }
-    printf("SOmething went wrong in prompt_cmd\n\n");
+    printf("Something went wrong in prompt_cmd\n\n");
     return 1;
 }
 

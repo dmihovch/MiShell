@@ -62,7 +62,7 @@ void print_path_debug(path_node *head)
     }
 }
 
-void free_all_mallocs(token_node *cmd_head, path_node **path, char **previous_directory, char **current_directory, char** prompt_prefix)
+void free_all_mallocs(token_node *cmd_head, path_node **path, char **previous_directory, char **current_directory, char** prompt_prefix, FILE* input)
 {
     if (cmd_head != NULL)
     {
@@ -82,6 +82,9 @@ void free_all_mallocs(token_node *cmd_head, path_node **path, char **previous_di
     if(prompt_prefix != NULL && *prompt_prefix != NULL){
         free(*prompt_prefix);
     }
+    if(input != stdin){
+        fclose(input);
+    }
 }
 
 
@@ -97,22 +100,47 @@ void reassign_current_and_previous_directory(char** current_directory, char** pr
     free(*tmp_current_directory);
 }
 
-int get_input(char** cmd_raw,size_t* cmd_len){
-    int num_read = getline(cmd_raw, cmd_len, stdin);
+int get_input(char** cmd_raw,size_t* cmd_len, FILE* input){
+    *cmd_raw = NULL;
+    int num_read = getline(cmd_raw, cmd_len, input);
+
     if (num_read == 1)
     { // handles just hitting enter
-        free(*cmd_raw);
-        *cmd_raw = NULL;
-        return num_read;
-    }
-    if (num_read != -1)
-    { // replaces newline with null terminator
-        if ((*cmd_raw)[num_read - 1] == '\n')
-        {
-            (*cmd_raw)[num_read - 1] = '\0';
-            --num_read;
+
+        if(*cmd_raw != NULL){
+             free(*cmd_raw);
+            *cmd_raw = NULL;
         }
         return num_read;
+    }
+
+
+    //jesus f'ing christ I want to meat crayon myself over this
+    if(num_read == -1){
+        if(feof(stdin)){
+            clearerr(stdin);
+            if(*cmd_raw != NULL){
+                free(*cmd_raw);
+                *cmd_raw = NULL;
+            }
+            printf("\n");
+            return num_read;
+        }
+        if(feof(input)){
+            clearerr(input);
+            if(*cmd_raw!=NULL){
+                free(*cmd_raw);
+                *cmd_raw = NULL;
+            }
+            return num_read;
+        }
+    }
+    
+    // replaces newline with null terminator
+    if ((*cmd_raw)[num_read - 1] == '\n')
+    {
+        (*cmd_raw)[num_read - 1] = '\0';
+        --num_read; //this could be an issue
     }
     return num_read;
 }

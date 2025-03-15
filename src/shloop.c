@@ -1,7 +1,20 @@
 #include "../include/shloop.h"
 
-int shell_loop()
+int shell_loop(FILE *input)
 {
+
+
+
+
+    if(input != stdin){
+
+    }
+
+
+
+
+
+
 
     token_node *head;
 
@@ -29,7 +42,6 @@ int shell_loop()
 
     char* prompt_prefix = NULL;
     char* prompt; //want to change this
-    char* user = "Dan";
     // MUST FIGURE THIS OuT
 
     // print_path_debug(path);
@@ -55,20 +67,38 @@ int shell_loop()
         */
 
         // reads in prompt and gets rid of newline
-        prompt = malloc(256); // need this to be dynamic
 
-        if(prompt_prefix == NULL){
-            sprintf(prompt,"%s $ ",current_directory);
-        }
-        if(prompt_prefix != NULL){
-            sprintf(prompt, "%s@%s $ ",prompt_prefix,current_directory);
-        }
-        printf("%s",prompt);
-        free(prompt);
+        if(input == stdin){
+            prompt = malloc(256); // need this to be dynamic
 
-        num_read = get_input(&cmd_raw,&cmd_len);
-        if(num_read == 1 || cmd_raw == NULL){
+            if(prompt_prefix == NULL){
+                sprintf(prompt,"%s $ ",current_directory);
+            }
+            if(prompt_prefix != NULL){
+                sprintf(prompt, "%s@%s $ ",prompt_prefix,current_directory);
+            }
+            printf("%s",prompt);
+            free(prompt);
+        }
+
+        
+
+        num_read = get_input(&cmd_raw,&cmd_len, input);
+        if(num_read == 1){
             continue;
+        }
+
+        if(num_read == -1 && input == stdin){
+            continue;
+        }
+        
+        if(num_read == -1 && input != stdin){
+            printf("EOF encountered\n");
+            free(previous_directory);
+            free(current_directory);
+            free_path(&path);
+            //free(cmd_raw);
+            return 0;
         }
 
         head = tokenizer(cmd_raw);
@@ -78,13 +108,13 @@ int shell_loop()
             continue;
         }
         // print_tokens_debug(head);
-        return_code = check_builtin(head, &path, &previous_directory, &current_directory, &prompt_prefix);
+        return_code = check_builtin(head, &path, &previous_directory, &current_directory, &prompt_prefix, input);
         // check for return codes, to see what is next
 
         free_tokens(head);
     }
 
-    free_all_mallocs(head, &path, &previous_directory, &current_directory, &prompt_prefix); // just in case
+    free_all_mallocs(head, &path, &previous_directory, &current_directory, &prompt_prefix, input); // just in case
 
     printf("\n\n\n\n\nTHIS SHOULD NEVER? PRINT!!\n\n\n\n\n");
     return 0;
