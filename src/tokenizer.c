@@ -9,6 +9,8 @@ token_node* tokenizer(char* cmd_raw){
         }
 
 
+
+
         token_node* head = (token_node*) calloc(1,sizeof(token_node));
         head->token = strdup(tok);
         head->next = NULL;
@@ -56,9 +58,10 @@ void print_tokens_debug(token_node* head){
     //printf("printing...\n");
     while(head!=NULL){
         if(head->token == NULL){
+            printf("Encountered a NULL token\n");
             return;
         }
-        //printf("{%s} ::: {%p}\n", head->token, &head->token);
+        printf("{%s} ::: {%p}\n", head->token, &head->token);
         head = head->next;
     }
     //printf("Printed!\n");

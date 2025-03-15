@@ -1,6 +1,6 @@
 #include "../include/builtins.h"
 
-int check_builtin(token_node *cmd_head, path_node **path, char **previous_directory, char** current_directory, char** prompt_prefix, FILE* input)
+int check_builtin(token_node *cmd_head, path_node **path, char **previous_directory, char** current_directory, char** prompt_prefix, FILE* input, int* found_cmd)
 {
     // printf("Entering builtin\n");
     if (cmd_head != NULL && cmd_head->token != NULL)
@@ -11,40 +11,49 @@ int check_builtin(token_node *cmd_head, path_node **path, char **previous_direct
 
         if (strcmp(cmd, "exit") == 0)
         {
+            *found_cmd = 1;
             ret_code = exit_cmd(cmd_head, path, previous_directory, current_directory, prompt_prefix, input);
         }
         if (strcmp(cmd, "which") == 0)
         {
+            *found_cmd = 1;
             ret_code = which_cmd(cmd_head, *path);
         }
         if (strcmp(cmd, "list") == 0)
         {
+            *found_cmd = 1;
             ret_code = list_cmd(cmd_head, *path);
         }
         if (strcmp(cmd, "pwd") == 0)
         {
+            *found_cmd = 1;
             ret_code = pwd_cmd();
         }
         if (strcmp(cmd, "cd") == 0)
         {
+            *found_cmd = 1;
             ret_code = cd_cmd(cmd_head, previous_directory, current_directory);
         }
         if((strcmp(cmd, "prompt") == 0) && input == stdin){
+            *found_cmd = 1;
             ret_code = prompt_cmd(cmd_head, prompt_prefix);
         }
         if(strcmp(cmd, "pid")== 0){
+            *found_cmd = 1;
             ret_code = pid_cmd();
         }
         if(strcmp(cmd, "printenv") == 0){
+            *found_cmd = 1;
             ret_code = printenv_cmd(cmd_head);
         }
         if(strcmp(cmd, "setenv") == 0)
         {
+            *found_cmd = 1;
             ret_code = setenv_cmd(cmd_head,path);
         }
         return ret_code;
     }
-    return 1; // return codes?
+    return 0; // return codes?
 }
 
 // should be good
@@ -152,6 +161,9 @@ int pwd_cmd()
 
 int cd_cmd(token_node *cmd_head, char **prev_directory, char **current_directory)
 {
+    if(cmd_head != NULL && cmd_head->next != NULL && cmd_head->next->next != NULL){
+        printf("Multiple arguments passed to cd: Will only cd into first valid directory\n");
+    }
 
     char* tmp_current_directory = strdup(*current_directory);
 

@@ -6,6 +6,7 @@
 #include <string.h>
 #include <dirent.h>
 #include <signal.h>
+#include <glob.h>
 #include <stdbool.h>
 #include "../include/tokenizer.h"
 
@@ -31,3 +32,8 @@ void reset_terminal_settings();
 int handle_exit_logic(token_node *, path_node **, char **, char **, char** , FILE* , int);
 void read_directory(DIR*);
 int open_directory_and_read(char*, bool);
+void glob_handling(token_node**);
+token_node* glob_tokenizer(glob_t);
+token_node* get_last_node(token_node*);
+char** create_argv_arr(token_node*);
+void free_argv_arr(char**);

@@ -30,7 +30,7 @@ int main(int argc, char **argv)
         fclose(input_method);
     }
 
-
-
+    printf("Exiting shell with code %d\n", last_exit_code);
+    exit(last_exit_code);
     return last_exit_code;
 }

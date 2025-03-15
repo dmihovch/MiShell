@@ -203,3 +203,121 @@ int open_directory_and_read(char* target_dir, bool mult){
     return 0;
 }
 
+
+//I think I am truly a cooked cs student
+void glob_handling(token_node** cmd_head){
+    if(cmd_head == NULL || *cmd_head== NULL){
+        return;
+    }
+    token_node* arg = *cmd_head;
+    glob_t expanded;
+    const int flags = GLOB_NOSORT | GLOB_MARK | GLOB_TILDE;
+
+    while(arg!=NULL && arg->token!=NULL){
+        if(glob(arg->token,flags,NULL,&expanded)==0){
+
+            token_node* prev_arg = arg->prev;
+            token_node* next_arg = arg->next;
+            token_node* new_args = glob_tokenizer(expanded);
+            if(new_args != NULL){
+                token_node* arg_tmp = arg -> next;
+                if(prev_arg != NULL){
+                    prev_arg ->next = new_args;
+                    new_args->prev = prev_arg;
+                }
+                if(prev_arg == NULL){
+                    *cmd_head = new_args;
+                }
+                if(next_arg != NULL){
+                    token_node* last_new_node = get_last_node(new_args);
+                    
+                    last_new_node -> next = next_arg;
+                    next_arg -> prev = last_new_node;
+                    
+                    
+                }
+                free(arg->token);
+                free(arg);
+                arg = arg_tmp;
+                globfree(&expanded);
+                continue;
+            }
+
+            
+        }
+        else{
+            globfree(&expanded);
+            arg = arg->next;
+            continue;
+        }
+        globfree(&expanded);
+        arg=arg->next;
+    }
+
+}
+
+token_node* glob_tokenizer(glob_t expanded){
+    if(expanded.gl_pathc == 0){
+        return NULL;
+    }
+    token_node* head;
+    token_node* cur;
+    for(int i = 0; i<expanded.gl_pathc; i++){
+        if(i==0){
+            head = (token_node*) calloc(1,sizeof(token_node));
+            head->token = strdup(expanded.gl_pathv[i]);
+            head->prev = NULL;
+            head->next = NULL;
+            cur = head;
+        }
+        else{
+            cur -> next = (token_node*) calloc(1,sizeof(token_node));
+            cur -> next ->prev = cur;
+            cur->next ->next = NULL;
+            cur -> next -> token = strdup(expanded.gl_pathv[i]);
+            cur = cur -> next;
+        }
+    }
+    return head;
+}
+
+token_node* get_last_node(token_node* head){
+    token_node* last = head;
+    while(last!= NULL && last->next != NULL){
+        last=last->next;
+    }
+    return last;
+}
+
+char** create_argv_arr(token_node* arg){
+    int argc = 0;
+    token_node* counter = arg;
+    while(counter != NULL && counter->token != NULL){
+        ++argc;
+        counter = counter->next;
+    }
+
+    char** argv = malloc((argc+1)*sizeof(char*));
+
+    for(int i = 0; arg != NULL && arg->token != NULL; i++){
+        argv[i] = strdup(arg->token);
+        if(argv[i] == NULL){
+            perror("strdup failed");
+            for(int j = 0; j < i && argv[j] != NULL; j++){
+                free(argv[j]);
+            }
+            free(argv);
+            return NULL;
+        }
+        arg = arg->next;
+    }
+    argv[argc] = NULL;
+    return argv;
+}
+
+void free_argv_arr(char** argv){
+    for(int i = 0; argv[i] != NULL; i++){
+        free(argv[i]);
+    }
+    free(argv);
+}

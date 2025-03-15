@@ -13,7 +13,7 @@
 
 #define BUILTIN_COMMANDS_ARR_LENGTH 8
 
-int check_builtin(token_node *, path_node **, char **, char**, char**, FILE*);
+int check_builtin(token_node *, path_node **, char **, char**, char**, FILE*, int*);
 int exit_cmd(token_node *, path_node **, char **, char**, char**, FILE*);
 int which_cmd(token_node *, path_node *);
 int list_cmd(token_node *, path_node *); // needs to support pipes, eventually

@@ -19,7 +19,7 @@ int shell_loop(FILE *input)
     token_node *head;
 
     // return codes for functions
-    int return_code;
+    int return_code = 0;
 
     // collecting prompt
     char *cmd_raw;
@@ -43,13 +43,12 @@ int shell_loop(FILE *input)
     char* prompt_prefix = NULL;
     char* prompt; //want to change this
     // MUST FIGURE THIS OuT
-
+    int cmd_found_and_exec = 0;
     // print_path_debug(path);
-
     while (1)
     {
 
-        return_code = 0;
+        
         cmd_raw = NULL;
         cmd_len = 0;
         num_read = 0;
@@ -93,12 +92,11 @@ int shell_loop(FILE *input)
         }
         
         if(num_read == -1 && input != stdin){
-            printf("EOF encountered\n");
             free(previous_directory);
             free(current_directory);
             free_path(&path);
             //free(cmd_raw);
-            return 0;
+            return return_code;
         }
 
         head = tokenizer(cmd_raw);
@@ -107,15 +105,24 @@ int shell_loop(FILE *input)
         {
             continue;
         }
-        // print_tokens_debug(head);
-        return_code = check_builtin(head, &path, &previous_directory, &current_directory, &prompt_prefix, input);
+
+        glob_handling(&head);
+
+        print_tokens_debug(head);
+        cmd_found_and_exec = 0;
+        return_code = check_builtin(head, &path, &previous_directory, &current_directory, &prompt_prefix, input, &cmd_found_and_exec);
+        
+        if(cmd_found_and_exec == 0){
+            return_code = exec_abs_rel_path(head,&cmd_found_and_exec);
+        }
+        if(cmd_found_and_exec == 0){
+            return_code = exec_cmd_with_path(head,path,&cmd_found_and_exec);
+        }
         // check for return codes, to see what is next
 
         free_tokens(head);
     }
 
     free_all_mallocs(head, &path, &previous_directory, &current_directory, &prompt_prefix, input); // just in case
-
-    printf("\n\n\n\n\nTHIS SHOULD NEVER? PRINT!!\n\n\n\n\n"); //delete at end
-    return 0;
+    return return_code;
 }

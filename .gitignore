@@ -1,3 +1,7 @@
 .vscode/
 sh
 *.o
+test
+test.c
+testc
+todo
