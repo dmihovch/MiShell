@@ -12,43 +12,52 @@ int check_builtin(token_node *cmd_head, path_node **path, char **previous_direct
         if (strcmp(cmd, "exit") == 0)
         {
             *found_cmd = 1;
+            printf("Executing built-in [%s]\n",cmd);
             ret_code = exit_cmd(cmd_head, path, previous_directory, current_directory, prompt_prefix, input);
         }
         if (strcmp(cmd, "which") == 0)
         {
             *found_cmd = 1;
+            printf("Executing built-in [%s]\n",cmd);
             ret_code = which_cmd(cmd_head, *path);
         }
         if (strcmp(cmd, "list") == 0)
         {
             *found_cmd = 1;
+            printf("Executing built-in [%s]\n",cmd);
             ret_code = list_cmd(cmd_head, *path);
         }
         if (strcmp(cmd, "pwd") == 0)
         {
             *found_cmd = 1;
+            printf("Executing built-in [%s]\n",cmd);
             ret_code = pwd_cmd();
         }
         if (strcmp(cmd, "cd") == 0)
         {
             *found_cmd = 1;
+            printf("Executing built-in [%s]\n",cmd);
             ret_code = cd_cmd(cmd_head, previous_directory, current_directory);
         }
         if((strcmp(cmd, "prompt") == 0) && input == stdin){
             *found_cmd = 1;
+            printf("Executing built-in [%s]\n",cmd);
             ret_code = prompt_cmd(cmd_head, prompt_prefix);
         }
         if(strcmp(cmd, "pid")== 0){
             *found_cmd = 1;
+            printf("Executing built-in [%s]\n",cmd);
             ret_code = pid_cmd();
         }
         if(strcmp(cmd, "printenv") == 0){
             *found_cmd = 1;
+            printf("Executing built-in [%s]\n",cmd);
             ret_code = printenv_cmd(cmd_head);
         }
         if(strcmp(cmd, "setenv") == 0)
         {
             *found_cmd = 1;
+            printf("Executing built-in [%s]\n",cmd);
             ret_code = setenv_cmd(cmd_head,path);
         }
         return ret_code;

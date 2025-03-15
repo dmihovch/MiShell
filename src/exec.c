@@ -58,6 +58,8 @@ int fork_and_exec(char* cmd_path, char** argv){
     }
     if(pid == 0){
 
+        printf("Executing [%s]\n",cmd_path);
+
         reset_terminal_settings();
         //this is the child process
 

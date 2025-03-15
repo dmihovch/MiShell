@@ -107,8 +107,7 @@ int shell_loop(FILE *input)
         }
 
         glob_handling(&head);
-
-        print_tokens_debug(head);
+        
         cmd_found_and_exec = 0;
         return_code = check_builtin(head, &path, &previous_directory, &current_directory, &prompt_prefix, input, &cmd_found_and_exec);
         
@@ -117,6 +116,10 @@ int shell_loop(FILE *input)
         }
         if(cmd_found_and_exec == 0){
             return_code = exec_cmd_with_path(head,path,&cmd_found_and_exec);
+        }
+
+        if(cmd_found_and_exec == 0){
+            printf("%s: Command not found.\n",head->token);
         }
         // check for return codes, to see what is next
 
