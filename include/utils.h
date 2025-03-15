@@ -4,7 +4,12 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <signal.h>
 #include "../include/tokenizer.h"
+
+
+
 
 typedef struct path_node
 {
@@ -19,3 +24,6 @@ void free_all_mallocs(token_node *, path_node **, char **, char **, char**, FILE
 void reassign_current_and_previous_directory(char**, char**, char**);
 int get_input(char**,size_t*,FILE*);
 void print_whole_environment();
+void disable_ctrl_printing();
+void handle_signal(int);
+void reset_terminal_settings();

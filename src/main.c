@@ -3,6 +3,16 @@
 int main(int argc, char **argv)
 {
 
+    
+    
+    disable_ctrl_printing();
+
+
+
+    //FOR CHILD PROCESSES, NEED TO USE signal(SIGINT, SIG_DFL); etc so that ctrl + c/z/etc are no longer ignored
+    //call reset_terminal_settings()
+
+
     FILE *input_method = stdin;
     
 
@@ -22,5 +32,5 @@ int main(int argc, char **argv)
 
 
 
-    return 0;
+    return last_exit_code;
 }

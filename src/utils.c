@@ -153,3 +153,23 @@ void print_whole_environment(){
         ++env;
     }
 }
+
+
+void handle_signal(int signal){ //doesn't currently do much, idk
+    if(signal == SIGINT || signal == SIGTSTP || signal == SIGTERM){
+        return;
+    }
+}
+
+void disable_ctrl_printing(){
+    signal(SIGINT, handle_signal);
+    signal(SIGTSTP,handle_signal);
+    signal(SIGTERM,handle_signal);
+}
+
+void reset_terminal_settings(){
+    signal(SIGINT, SIG_DFL);
+    signal(SIGTSTP,SIG_DFL);
+    signal(SIGTERM,SIG_DFL);
+}
+
