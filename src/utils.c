@@ -173,3 +173,33 @@ void reset_terminal_settings(){
     signal(SIGTERM,SIG_DFL);
 }
 
+
+int handle_exit_logic(token_node *cmd_head, path_node **path, char **previous_directory, char **current_directory, char** prompt_prefix, FILE* input, int ret_code){
+    printf("Exiting shell with code %d\n", ret_code);
+    free_all_mallocs(cmd_head, path, previous_directory, current_directory, prompt_prefix,input);
+    exit(ret_code);
+    return ret_code;
+}
+
+void read_directory(DIR* directory){
+    struct dirent* entry;
+    while ((entry = readdir(directory)))
+    {
+        printf("%s\n", entry->d_name);
+    }
+}
+
+int open_directory_and_read(char* target_dir, bool mult){
+    DIR* directory = opendir(target_dir);
+    if(directory == NULL){
+        perror("Error opening directory");
+        return 1;
+    }
+    if(mult){
+        printf("%s:\n",target_dir);
+    }
+    read_directory(directory);
+    closedir(directory);
+    return 0;
+}
+

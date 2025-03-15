@@ -116,6 +116,6 @@ int shell_loop(FILE *input)
 
     free_all_mallocs(head, &path, &previous_directory, &current_directory, &prompt_prefix, input); // just in case
 
-    printf("\n\n\n\n\nTHIS SHOULD NEVER? PRINT!!\n\n\n\n\n");
+    printf("\n\n\n\n\nTHIS SHOULD NEVER? PRINT!!\n\n\n\n\n"); //delete at end
     return 0;
 }

@@ -4,8 +4,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <dirent.h>
 #include <signal.h>
+#include <stdbool.h>
 #include "../include/tokenizer.h"
 
 
@@ -27,3 +28,6 @@ void print_whole_environment();
 void disable_ctrl_printing();
 void handle_signal(int);
 void reset_terminal_settings();
+int handle_exit_logic(token_node *, path_node **, char **, char **, char** , FILE* , int);
+void read_directory(DIR*);
+int open_directory_and_read(char*, bool);

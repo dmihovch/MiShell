@@ -8,9 +8,10 @@ int check_builtin(token_node *cmd_head, path_node **path, char **previous_direct
         int ret_code;
         // printf("%s\n",cmd_head->token);
         char *cmd = cmd_head->token;
+
         if (strcmp(cmd, "exit") == 0)
         {
-            exit_cmd(cmd_head, path, previous_directory, current_directory, prompt_prefix, input);
+            ret_code = exit_cmd(cmd_head, path, previous_directory, current_directory, prompt_prefix, input);
         }
         if (strcmp(cmd, "which") == 0)
         {
@@ -22,52 +23,39 @@ int check_builtin(token_node *cmd_head, path_node **path, char **previous_direct
         }
         if (strcmp(cmd, "pwd") == 0)
         {
-
             ret_code = pwd_cmd();
         }
         if (strcmp(cmd, "cd") == 0)
         {
-            //printf("previous directory in builtin: %s\n", *previous_directory);
             ret_code = cd_cmd(cmd_head, previous_directory, current_directory);
-            //printf("previous directory in builtin after cd cmd: %s\n", *previous_directory);
         }
         if((strcmp(cmd, "prompt") == 0) && input == stdin){
             ret_code = prompt_cmd(cmd_head, prompt_prefix);
         }
         if(strcmp(cmd, "pid")== 0){
-            pid_cmd();
+            ret_code = pid_cmd();
         }
         if(strcmp(cmd, "printenv") == 0){
             ret_code = printenv_cmd(cmd_head);
         }
-        if(strcmp(cmd, "setenv") == 0){
+        if(strcmp(cmd, "setenv") == 0)
+        {
             ret_code = setenv_cmd(cmd_head,path);
         }
+        return ret_code;
     }
-    else
-    {
-        printf("cmd_head || cmd_head->token == NULL\n");
-        return 0;
-    }
-
-    return 0; // return codes?
+    return 1; // return codes?
 }
 
 // should be good
-void exit_cmd(token_node *cmd_head, path_node **path, char **previous_directory, char **current_directory, char** prompt_prefix, FILE* input)
+int exit_cmd(token_node *cmd_head, path_node **path, char **previous_directory, char **current_directory, char** prompt_prefix, FILE* input)
 {
     token_node *arg_node = cmd_head->next;
-    int ret_code;
     if (arg_node != NULL && arg_node->token != NULL)
     {
-        ret_code = atoi(arg_node->token);
-        printf("Exiting shell with code %d\n", ret_code);
-        free_all_mallocs(cmd_head, path, previous_directory, current_directory, prompt_prefix,input);
-        exit(ret_code);
+        return handle_exit_logic(cmd_head,path,previous_directory,current_directory,prompt_prefix,input,atoi(arg_node->token));
     }
-    free_all_mallocs(cmd_head, path, previous_directory, current_directory, prompt_prefix,input);
-    printf("Exiting shell with code 0, token is NULL\n"); // delete after 0 for sub
-    exit(0);
+    return handle_exit_logic(cmd_head,path,previous_directory,current_directory,prompt_prefix,input,0);
 }
 int which_cmd(token_node *cmd_head, path_node *path)
 {
@@ -129,61 +117,25 @@ int which_cmd(token_node *cmd_head, path_node *path)
 int list_cmd(token_node *cmd_head, path_node *path)
 {
     token_node *arg = cmd_head->next;
-    struct dirent *entry;
-    DIR *directory_path;
+    int ret_code;
     if (arg == NULL)
     {
-        directory_path = opendir(".");
-        if (directory_path == NULL)
-        {
-            perror("que?"); // lol, this can't ever fail, right?
-            return 1;
-        }
-
-        while ((entry = readdir(directory_path)))
-        {
-            printf("%s\n", entry->d_name);
-        }
+        ret_code = open_directory_and_read(".",false);
     }
-    char *directory_target;
-    bool only_one = true;
     while (arg != NULL && arg->token != NULL)
     {
+        ret_code = open_directory_and_read(arg->token,true);
 
-        directory_target = arg->token;
-        directory_path = opendir(directory_target);
-        if (directory_path == NULL)
-        {
-            perror("Error opening file");
-            if ((arg = arg->next) != NULL)
-            {
-                printf("\n");
-                continue;
-            }
-            break;
-        }
-
-        entry = readdir(directory_path);
-
-        printf("%s:\n", directory_target);
-
-        while (entry != NULL)
-        {
-            printf("%s\n", entry->d_name);
-            entry = readdir(directory_path);
-        }
         if (arg->next != NULL)
         {
             printf("\n");
         }
-
         arg = arg->next;
     }
-    if(directory_path != NULL){
-        closedir(directory_path);
-    }
-    return 0;
+    return ret_code;
 }
+
+//path ** need to reset to head
 
 int pwd_cmd()
 {
@@ -281,8 +233,9 @@ int prompt_cmd(token_node* cmd_head, char** prompt_prefix){
     return 1;
 }
 
-void pid_cmd(){
+int pid_cmd(){
     printf("Current Process ID: %d\n", getpid());
+    return 0;
 }
 
 int printenv_cmd(token_node* cmd_head){
