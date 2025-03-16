@@ -11,7 +11,6 @@ char* find_cmd_with_path(path_node* path, char* cmd_name){
     while(path!=NULL && path->path!=NULL){
 
 
-        //printf("%ld\n",strlen(path->path));
         buf_size = (strlen(path->path)+strlen(cmd_name)+2);
         cmd_path_buffer = calloc(buf_size, sizeof(char));
         

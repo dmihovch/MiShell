@@ -10,9 +10,3 @@ run: sh
 	@exec ./sh
 clean: 
 	@rm -rf *.o sh
-
-runv: sh
-	@exec valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./sh
-
-runv-test: sh test
-	@exec valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./sh test

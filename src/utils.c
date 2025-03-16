@@ -1,9 +1,7 @@
 #include "../include/utils.h"
-// just put this in main?
 path_node *get_path()
 {
     char *path_raw = getenv("PATH");
-    // printf("Raw PATH:\n\n%s\n\n",path_raw);
     if (path_raw != NULL)
     {
         char *path_elem = strtok(path_raw, ":");
@@ -326,17 +324,18 @@ void free_argv_arr(char** argv){
 int simple_cd(char* path,char **prev_directory, char **current_directory){
     char* tmp_current_directory = strdup(*current_directory);
 
-    //printf("Directory was: %s\n", getcwd(NULL, 0));
     int ret_code;
 
     ret_code = chdir(path);
+    if(ret_code!=0){
+        free(tmp_current_directory);
+        perror("chdir failed");
+        return ret_code;
+    }
 
     //successful cd
     reassign_current_and_previous_directory(current_directory,prev_directory,&tmp_current_directory);
     
     return ret_code;
 
-    //need to implement prev-directory stuff
-
-    return 0;
 }

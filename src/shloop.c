@@ -57,23 +57,20 @@ int shell_loop(FILE *input)
 
                         todo -
                         figure out how to do scrolling with arrow keys (cmds)
-                        add null checks for each malloc and strdup
-                        at end see if I can remove the path arg from the builtins
-
-
-                        PREV DIRECTRY STUFF!
+                        
 
         */
 
         // reads in prompt and gets rid of newline
 
         if(input == stdin){
-            prompt = malloc(256); // need this to be dynamic
 
             if(prompt_prefix == NULL){
+                prompt = calloc(1,strlen(current_directory)+5);
                 sprintf(prompt,"%s $ ",current_directory);
             }
             if(prompt_prefix != NULL){
+                prompt = calloc(1,strlen(current_directory)+strlen(prompt_prefix)+6);
                 sprintf(prompt, "%s@%s $ ",prompt_prefix,current_directory);
             }
             printf("%s",prompt);
