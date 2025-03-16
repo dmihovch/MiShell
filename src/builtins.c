@@ -171,7 +171,8 @@ int pwd_cmd()
 int cd_cmd(token_node *cmd_head, char **prev_directory, char **current_directory)
 {
     if(cmd_head != NULL && cmd_head->next != NULL && cmd_head->next->next != NULL){
-        printf("Multiple arguments passed to cd: Will only cd into first valid directory\n");
+        printf("cd: too many arguments\n");
+        return 1;
     }
 
     char* tmp_current_directory = strdup(*current_directory);

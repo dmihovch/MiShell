@@ -7,6 +7,11 @@
         "string.h": "c",
         "exec.h": "c",
         "types.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "shloop.h": "c",
+        "signal.h": "c",
+        "sigaction.h": "c",
+        "unistd.h": "c",
+        "glob.h": "c"
     }
 }

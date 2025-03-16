@@ -113,6 +113,9 @@ int shell_loop(FILE *input)
         
         if(cmd_found_and_exec == 0){
             return_code = exec_abs_rel_path(head,&cmd_found_and_exec);
+            if(return_code == CD_INSTEAD){
+                return_code = simple_cd(head->token, &previous_directory, &current_directory);
+            }
         }
         if(cmd_found_and_exec == 0){
             return_code = exec_cmd_with_path(head,path,&cmd_found_and_exec);

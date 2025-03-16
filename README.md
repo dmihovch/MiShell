@@ -8,3 +8,6 @@
 2. Used ChatGPT to help figure out how to get ^Z and ^C from printing in the prompt
 
 
+
+
+executing a directory

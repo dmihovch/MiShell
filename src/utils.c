@@ -1,5 +1,4 @@
 #include "../include/utils.h"
-
 // just put this in main?
 path_node *get_path()
 {
@@ -161,10 +160,12 @@ void handle_signal(int signal){ //doesn't currently do much, idk
     }
 }
 
+//idk man it prints ^C and ^Z, and if you do kill -1 <shell pid>, there are memory leaks! yay!
 void disable_ctrl_printing(){
     signal(SIGINT, handle_signal);
     signal(SIGTSTP,handle_signal);
     signal(SIGTERM,handle_signal);
+
 }
 
 void reset_terminal_settings(){
@@ -320,4 +321,22 @@ void free_argv_arr(char** argv){
         free(argv[i]);
     }
     free(argv);
+}
+
+int simple_cd(char* path,char **prev_directory, char **current_directory){
+    char* tmp_current_directory = strdup(*current_directory);
+
+    //printf("Directory was: %s\n", getcwd(NULL, 0));
+    int ret_code;
+
+    ret_code = chdir(path);
+
+    //successful cd
+    reassign_current_and_previous_directory(current_directory,prev_directory,&tmp_current_directory);
+    
+    return ret_code;
+
+    //need to implement prev-directory stuff
+
+    return 0;
 }

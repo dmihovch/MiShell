@@ -8,9 +8,10 @@
 #include <signal.h>
 #include <glob.h>
 #include <stdbool.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include "../include/tokenizer.h"
-
-
+#include <bits/sigaction.h>
 
 
 typedef struct path_node
@@ -37,3 +38,4 @@ token_node* glob_tokenizer(glob_t);
 token_node* get_last_node(token_node*);
 char** create_argv_arr(token_node*);
 void free_argv_arr(char**);
+int simple_cd(char*,char**,char**);

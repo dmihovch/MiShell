@@ -83,6 +83,12 @@ int exec_abs_rel_path(token_node* cmd, int* cmd_found_and_exec){
     int ret_code = 0;
     if(cmd != NULL && cmd->token != NULL){
         if(access(cmd->token, X_OK) == 0){
+
+            if(is_directory(cmd->token)){
+                *cmd_found_and_exec = 1;
+                return CD_INSTEAD;
+            }
+
             *cmd_found_and_exec = 1;
             char** argv = create_argv_arr(cmd);
             ret_code = fork_and_exec(cmd->token, argv);
@@ -91,4 +97,13 @@ int exec_abs_rel_path(token_node* cmd, int* cmd_found_and_exec){
 
         }
     }
+}
+
+int is_directory(char* dir){
+    struct stat path;
+    if(stat(dir, &path)==-1){
+        perror("stat failure");
+        return 0; //error
+    }
+    return S_ISDIR(path.st_mode);
 }
