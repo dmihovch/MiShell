@@ -2,8 +2,8 @@
 //remember to free whatever variable this is assigned to
 char* find_cmd_with_path(path_node* path, char* cmd_name){
 
-    
-    
+
+
 
     char* cmd_path_buffer;
     size_t buf_size;
@@ -13,7 +13,7 @@ char* find_cmd_with_path(path_node* path, char* cmd_name){
 
         buf_size = (strlen(path->path)+strlen(cmd_name)+2);
         cmd_path_buffer = calloc(buf_size, sizeof(char));
-        
+
 
         snprintf(cmd_path_buffer, buf_size, "%s/%s", path->path,cmd_name);
         if(access(cmd_path_buffer, X_OK) == 0){
@@ -21,7 +21,7 @@ char* find_cmd_with_path(path_node* path, char* cmd_name){
         }
         free(cmd_path_buffer);
         path = path->next;
-        
+
     }
     return NULL;
 }
@@ -74,7 +74,7 @@ int fork_and_exec(char* cmd_path, char** argv){
                 printf("Command exited with status: %d\n", exit_code);
             }
         }
-    } 
+    }
     return exit_code;
 }
 
@@ -95,7 +95,9 @@ int exec_abs_rel_path(token_node* cmd, int* cmd_found_and_exec){
             return ret_code;
 
         }
+        return ret_code;
     }
+    return ret_code;
 }
 
 int is_directory(char* dir){

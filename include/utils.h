@@ -11,7 +11,13 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include "../include/tokenizer.h"
-#include <bits/sigaction.h>
+
+#if defined(__APPLE__)
+  #include <crt_externs.h>
+  #define environ (*_NSGetEnviron())
+#else
+  extern char **environ;
+#endif
 
 
 typedef struct path_node

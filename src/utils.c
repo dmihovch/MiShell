@@ -42,11 +42,11 @@ void free_path(path_node **head)
 
         }
         free(tmp);
-        
+
     }
 
     *head = NULL;
-    
+
 }
 
 //if calling this, need to deref path
@@ -132,7 +132,7 @@ int get_input(char** cmd_raw,size_t* cmd_len, FILE* input){
             return num_read;
         }
     }
-    
+
     // replaces newline with null terminator
     if ((*cmd_raw)[num_read - 1] == '\n')
     {
@@ -143,8 +143,8 @@ int get_input(char** cmd_raw,size_t* cmd_len, FILE* input){
 }
 
 void print_whole_environment(){
-    extern char **__environ;
-    char **env = __environ;
+    extern char **environ;
+    char **env = environ;
     while(*env != NULL){
         printf("%s\n", *env);
         ++env;
@@ -229,11 +229,11 @@ void glob_handling(token_node** cmd_head){
                 }
                 if(next_arg != NULL){
                     token_node* last_new_node = get_last_node(new_args);
-                    
+
                     last_new_node -> next = next_arg;
                     next_arg -> prev = last_new_node;
-                    
-                    
+
+
                 }
                 free(arg->token);
                 free(arg);
@@ -242,7 +242,7 @@ void glob_handling(token_node** cmd_head){
                 continue;
             }
 
-            
+
         }
         else{
             globfree(&expanded);
@@ -335,7 +335,7 @@ int simple_cd(char* path,char **prev_directory, char **current_directory){
 
     //successful cd
     reassign_current_and_previous_directory(current_directory,prev_directory,&tmp_current_directory);
-    
+
     return ret_code;
 
 }
