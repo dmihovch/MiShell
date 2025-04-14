@@ -1,12 +1,17 @@
 CC=gcc
+CFLAGS = -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Werror -g
+MACFLAGS = -fsanitize=address
 
-sh:
-	@$(CC) -o sh src/shloop.c src/exec.c src/builtins.c  src/main.c src/tokenizer.c src/utils.c
+mishell:
+	@$(CC) $(CFLAGS) -o mishell src/shloop.c src/exec.c src/builtins.c  src/main.c src/tokenizer.c src/utils.c
 
 debug-mac:
-	@$(CC) -g -fsanitize=address -o sh src/shloop.c src/exec.c src/builtins.c  src/main.c src/tokenizer.c src/utils.c
+	@$(CC) $(CFLAGS) $(MACFLAGS) -o mishell src/shloop.c src/exec.c src/builtins.c  src/main.c src/tokenizer.c src/utils.c
 
-run: sh
-	@exec ./sh
-clean: 
-	@rm -rf *.o sh
+run: mishell
+	@./mishell
+
+valgrind: mishell
+	@valgrind --leak-check=full --show-leak-kinds=all ./mishell
+clean:
+	@rm -rf *.o mishell
